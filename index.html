@@ -1,0 +1,424 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>IDN Humanitarian Snapshot</title>
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="style.css" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"
+   integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+   crossorigin=""/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">
+
+
+   <style>
+    #loadinggif{
+      position: fixed;
+      z-index: 9000;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,.4);
+      padding-top: 45vh;
+      display: none;
+    }
+    #loadinggif img{
+        width: 50px;
+    }
+    .hrtooltip{
+        margin-top: 5px;
+    }
+    .blockchart{
+        height: 220px;
+        padding-left: 0px;
+    }
+    .titleblock{
+        margin-bottom: 15px;
+        /*text-align: center;*/
+    }
+   </style>
+        
+    </head>
+    <body>
+
+    <div id="loadinggif"><img src="http://fr.ethicon.com/sites/all/themes/ethicon/img/ajax-loader.gif"></div>
+
+    <!-- HEADER -->
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+          <div <div class="media-left" style="width: max-content;display: inline-flex;padding-right: 30px"><img src="images/logo_un.png" class="img-responsive"></div>
+          <h5 class="my-0 mr-md-auto font-weight-bold" style="color: #817b7b">INDONESIA: MONTHLY HUMANITARIAN SNAPSHOT</h5>
+          <nav class="my-2 my-md-0 mr-md-6 col-md-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <select id="themonth" class="form-control">
+                        <option value="January">January</option>
+                        <option value="February">February</option>
+                        <option value="March">March</option>
+                        <option value="April">April</option>
+                        <option value="May">May</option>
+                        <option value="June">June</option>
+                        <option value="July">July</option>
+                        <option value="August">August</option>
+                        <option value="September">September</option>
+                        <option value="October">October</option>
+                        <option value="November">November</option>
+                        <option value="December">December</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <select id="theyear" class="form-control">
+                    </select>
+                </div>
+            </div>
+          </nav>
+        </div>
+     <!--  <nav class="my-2 my-md-0 mr-md-3">
+        <h4 class="button" font-weight= 'bold' id="resetall">Clear Filter</h4>
+      </nav> -->
+        </div>
+        <!-- END HEADER -->
+        <div class="container">
+            <div class="col-12">
+                <div class="col-md-12 apanel">
+                    <div class="row">
+                        <div class="col-md-12" style="text-align: left;">
+                            <p class="pmap"></p>
+                        </div>
+                    </div>
+                </div>
+                <div id="map" style="width: 100%; height: 500px"></div>
+                <div class="row">
+                    <div class="col-md-3" style="font-size: 17px; color: grey; padding-top: 20px">
+                        <div class="titleblock">AFFECTED POPULATION</div>
+                        <div class="col-md-12 blockbar" style="padding-left: 0px; border-color: red; border-image: 1px; margin-bottom: 20px;">
+                            <div class='media'>
+                                <div class="media-left" style="width: max-content;display: inline-flex;padding-right: 10px">
+                                    <img src="images/casulaties.png" class="img-responsive">
+                                </div>
+                                <div class="media-body">
+                                    <h2 class="media-heading" id="valcasualites" style="margin-top: 25px">-</h2>
+                                    <p style='font-size: 12px'>number of casulaties</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class='media'>
+                            <div class="media-left" style="width: max-content;display: inline-flex;padding-right: 10px">
+                                <img src="images/popaffected.png" class="img-responsive">
+                            </div>
+                            <div class="media-body">
+                                <h2 class="media-heading" id="valaffected" style="margin-top: 10px">-</h2>
+                                <p style='font-size: 12px'>number of affected population</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4" style="font-size: 17px; color: grey; padding-top: 20px">
+                        <div class="titleblock">NUMBER OF DISASTER EVENT</div>
+                        <div class='row'>
+                            <div class="col-md-12 blockchart" id="chart_disaster" >
+                                <!-- BAR CHART -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-5" style="font-size: 17px; color: grey; padding-top: 20px">
+                        <div class="titleblock">AFFECTED PEOPLE BY TYPE OF DISASTER</div>
+                        <div class='row'>
+                            <div class="col-md-12 blockchart" id="chart_affected" >
+                            
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer>
+                <span class="pull-right" style="font-size: 12px; padding-right: 20px; padding-top: 5px">Powered by &nbsp;<a target="_blank" href="https://data.humdata.org/dataset/world-humanitarian-data-and-trends"><img class="img-responsive hdx" src='images/HDX-logo-home.png'></a></span>
+                </div>
+            </footer>
+        </div>
+        <br/><br/>
+
+        <script src="http://d3js.org/d3.v3.min.js"></script>
+        <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"
+   integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
+   crossorigin=""></script>
+
+        <!-- JAVASCRIPT LIBRARY -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js" integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+<script>
+    var map = L.map('map').setView([-2.0361833914499954,120.92711693632814], 5);
+        mapLink ='<a https://server.arcgisonline.com">OpenStreetMap</a>';
+    var tiles = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, BNPB, OCHA',maxZoom: 7,minZoom:4});
+    tiles.addTo(map);
+    map.scrollWheelZoom.disable();
+
+    var disasterCountPerProv = []; 
+    var Maxtotaldisaster = 0;  
+    var totalCasulaties = 0;
+    var totalAffected = 0;
+
+    var humanNumberRead = d3.format(",d");
+    var numdisaster = [];
+    var numaffected = [];
+    var tabledisaster=[['Disaster','Total']];
+    var tableaffected=[['Disaster','Total']];
+    var selectedyear = 0;
+    var selectedmonth = 0;
+
+
+    $(document).ready(function(){
+        selectedyear = new Date();
+            selectedyear = selectedyear.getFullYear();
+        for(var i=2018; i<=parseInt(selectedyear); i++){
+            console.log(i);
+            $('#theyear').append('<option value="'+i+'">'+i+'</option>');
+        }
+
+        var monthNames = ["January", "February", "March", "April", "May", "June","July", "August", "September", "October", "November", "December"];
+
+        var d = new Date();
+        if(d.getMonth() !=0){
+            selectedmonth = monthNames[d.getMonth() - 1];
+        }else{
+            selectedmonth = monthNames[11];
+            selectedyear -=1;
+            console.log(selectedmonth);
+        }
+        
+        $('#themonth option[value='+selectedmonth+']').attr('selected','selected');
+        $('#theyear option[value='+selectedyear+']').attr('selected','selected');
+
+        callthedata();
+        calltext()
+    })
+
+
+$('#themonth').on('change',function(){
+    changedate();
+})
+$('#theyear').on('change',function(){
+    changedate();
+})
+function changedate(){
+    $('.disastermarker').remove();
+    $('.blockchart').html('');
+
+    selectedmonth = $('#themonth').val();
+    selectedyear = $('#theyear').val();
+    callthedata();
+    calltext();
+}
+
+function calltext(){
+    $('.pmap').html('No data available at selected time. Please choose another month and year');
+    d3.csv('data/text_20190111_Sept_Des_2018.csv',function(data){
+        data.forEach(function(d,i){
+            if(d.Period == selectedmonth+' '+selectedyear){
+                $('.pmap').html(d.text);
+            }
+        })
+    })
+}
+
+function callthedata(){
+    disasterCountPerProv = []; 
+    Maxtotaldisaster = 0;  
+    totalCasulaties = 0;
+    totalAffected = 0;
+    numdisaster = [];
+    numaffected = [];
+    tabledisaster=[];
+    tableaffected=[];
+    var isavailable = 0;
+
+    // call data from sheet
+    d3.csv('data/20190111_Sept_Des_2018.csv',function(data){
+        data.forEach(function(d,i){
+
+            if(d.Period == selectedmonth+' '+selectedyear){
+                isavailable = 1;
+                if( !numdisaster[d.Event] ){
+                    numdisaster[d.Event] = 1 
+                }else{
+                    numdisaster[d.Event]+=1
+                }
+
+                if( !numaffected[d.Event] ){
+                    if(d.Affected){
+                        numaffected[d.Event] = parseInt(d.Affected)
+                    }else{
+                        numaffected[d.Event] = 0;
+                    }
+                }else{
+                    if(d.Affected){
+                        numaffected[d.Event] += parseInt(d.Affected)
+                    }
+                }
+
+                if(!disasterCountPerProv[d.IDPROV]){
+                    disasterCountPerProv[d.IDPROV] = {'Earthquake':0,'Earthquake and Tsunami':0,'Flood':0,'Landslide':0,'Tsunami':0,'Volcano Eruption':0,'Whirlwind':0,'Total':0,'coor':{},'IDPROV':d.IDPROV,'Province':d.Province}
+                }
+                
+                disasterCountPerProv[d.IDPROV][d.Event] += 1; 
+                disasterCountPerProv[d.IDPROV].Total +=1;
+                disasterCountPerProv[d.IDPROV].coor = {'lat':d.Ycoord,'lon':d.Xcoord};
+                if(d.Casualties){
+                    totalCasulaties+= parseInt(d.Casualties);
+                }
+                if(d.Affected){
+                    totalAffected += parseInt(d.Affected);
+                }
+            }
+
+        })
+        console.log(numdisaster)
+        if(!isavailable){
+            alert('No data available at selected time');
+            calltext();
+        }
+
+        $('#valcasualites').html(humanNumberRead(totalCasulaties));
+        $('#valaffected').html(humanNumberRead(totalAffected));
+
+        // loop for bubble on map
+        disasterCountPerProv.forEach(function(d){
+            if(Maxtotaldisaster < d.Total){
+                Maxtotaldisaster = d.Total
+            }
+        })
+        function getradius(val){
+            var clus = Maxtotaldisaster/5;
+            var radius = 0;
+            if(val > clus*4){
+                radius = 40;
+            }else if(val > clus*3){
+                radius = 30;
+            }else if(val > clus*2){
+                radius = 20;
+            }else if(val > clus*1){
+                radius = 10;
+            }else{
+                radius = 5;
+            }
+            return radius;
+        }
+        disasterCountPerProv.forEach(function(d){
+            
+            var html = '<b class="ttn">'+d.Province+'</b>'+'<br/>';
+                html += '<font class="ttt">Total Disaster : '+d.Total+'</font>'+'<hr/ class="hrtooltip">';
+
+            for(x in d){
+                if(x != 'Total' && x!='coor' && x!='IDPROV' && x!='Province'){
+                   html += '<font class="ttv">'+x+' : '+d[x]+'</font>'+'<br/>';
+                }
+            }
+
+            var circle = L.circleMarker([d.coor.lat,d.coor.lon], {
+                color: 'transparent',
+                fillColor: 'orange',
+                className: 'disastermarker',
+                fillOpacity: 0.5,
+                radius: getradius(d.Total)
+            }).addTo(map).bindPopup(html);
+        })
+
+        function sortFunction(a, b) {
+            if (a[1] === b[1]) {
+                return 0;
+            }
+            else {
+                return (a[1] < b[1]) ? 1 : -1;
+            }
+        }
+        for(x in numdisaster){
+            tabledisaster.push([x,numdisaster[x]]);
+        }
+        for(x in numaffected){
+            tableaffected.push([x,numaffected[x]]);
+        }
+
+        tabledisaster.sort(sortFunction);
+        tabledisaster.unshift(['Disaster','Total'])
+
+        tableaffected.sort(sortFunction);
+        tableaffected.unshift(['Disaster','Total'])
+
+        numdisevent();
+        numdisaffected();
+
+    })
+}
+
+    
+    function numdisevent(){
+        google.charts.load('current', {packages: ['corechart', 'bar']});
+        google.charts.setOnLoadCallback(drawBasic);
+
+        function drawBasic() {
+
+              var data = google.visualization.arrayToDataTable(tabledisaster);
+
+              var options = {
+                chartArea: {top:10,left:100,bottom:30,width: '70%'},
+                hAxis: {
+                  minValue: 0
+                },
+                vAxis: {
+                  // title: 'Disaster'
+                },
+                legend:{
+                    position:'none'
+                }
+              };
+
+              var chart = new google.visualization.BarChart(document.getElementById('chart_disaster'));
+              chart.draw(data, options);
+            }
+    }
+
+    function numdisaffected(){
+        google.charts.load('current', {packages: ['corechart', 'bar']});
+        google.charts.setOnLoadCallback(drawBasic);
+
+        function drawBasic() {
+
+              var data = google.visualization.arrayToDataTable(tableaffected);
+
+              var options = {
+                chartArea: {top:10,left:100,bottom:30,width: '70%'},
+                hAxis: {
+                  minValue: 0
+                },
+                vAxis: {
+                  // title: 'Disaster'
+                },
+                legend:{
+                    position:'none'
+                }
+              };
+
+              var chart = new google.visualization.BarChart(document.getElementById('chart_affected'));
+              chart.draw(data, options);
+            }
+    }
+
+</script>
+
+
+</body>
+</html>
